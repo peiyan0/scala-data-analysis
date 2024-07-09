@@ -54,4 +54,22 @@ object MyApp extends App {
     val mostCommonVaccine = totalDosesByVaxType.maxBy(_._2)
     println(s"Ans: The most commonly used vaccine is ${mostCommonVaccine._1} with a total of ${mostCommonVaccine._2} doses.")
 
+  // question 2
+  // Group data by vaccination type
+  println("\nQuestion 2: What are the average occurrence of headache for each type of vaccination product in the provided data?")
+
+  val aefiGroupedByVaxType = aefiData.groupBy(_.vaxtype)
+
+  // Calculate average occurrences of headache for each vaccination type
+  val avgHeadacheByVaxType = aefiGroupedByVaxType.map { case (vaxType, records) =>
+    val totalHeadache = records.map(r => r.d1_headache + r.d2_headache).sum
+    val count = records.size
+    vaxType -> (totalHeadache.toDouble / count)
+  }
+
+  // display each brand
+  println("Ans: \nAverage occurrence of headache for each vaccination product:")
+  avgHeadacheByVaxType.foreach { case (vaxType, avgHeadache) =>
+    println(s"$vaxType: $avgHeadache")
+  }
 }
