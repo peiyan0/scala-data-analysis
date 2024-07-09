@@ -12,9 +12,46 @@ case class AEFIData(
 
 object MyApp extends App {
   val path = "src/main/resources/aefi.csv"
-  val source = Source.fromFile(path)
-  val lines = source.getLines()
 
+  def readAEFIData(filePath: String): List[AEFIData] = {
+      val source = Source.fromFile(filePath)
+      val lines = source.getLines().drop(1) // Skip header line
+      val data = lines.map { line =>
+        val cols = line.split(",").map(_.trim)
+        AEFIData(
+          cols(0),
+          // vaccination type
+          cols(1),
+          // headache
+          cols(12).toInt,
+          cols(24).toInt,
+          // vomiting
+          cols(17).toInt,
+          cols(29).toInt
+        )
+      }.toList
+      source.close()
+      data
+    }
 
-  source.close()
+    // read data
+    val aefiData = readAEFIData(path)
+
+    // question 1
+    // Aggregate data for each vaccine type
+    println("\nQuestion 1: Which vaccination product is the most commonly used by Malaysian?")
+
+    val totalDosesByVaxType = aefiData.groupBy(_.vaxtype).map { case (vaxType, records) =>
+      val totalDoses = records.size
+      vaxType -> totalDoses
+    }
+
+    println("Total doses by vaccine type:")
+    totalDosesByVaxType.foreach { case (vaxType, totalDoses) =>
+      println(s"$vaxType: $totalDoses")
+    }
+
+    val mostCommonVaccine = totalDosesByVaxType.maxBy(_._2)
+    println(s"Ans: The most commonly used vaccine is ${mostCommonVaccine._1} with a total of ${mostCommonVaccine._2} doses.")
+
 }
