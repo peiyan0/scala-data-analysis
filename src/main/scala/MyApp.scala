@@ -91,6 +91,4 @@ object MyApp extends App {
     val highestVomitingVaxType = vomitingAfterFirstInjection.maxBy(_._2)
 
     println(s"Ans: The vaccination type with the highest occurrence of vomiting after the first injection is ${highestVomitingVaxType._1} with ${highestVomitingVaxType._2} occurrences.")
-  }
-}
 }
