@@ -72,4 +72,25 @@ object MyApp extends App {
   avgHeadacheByVaxType.foreach { case (vaxType, avgHeadache) =>
     println(s"$vaxType: $avgHeadache")
   }
+
+  // question 3
+    // Identify the vaccination type with the highest occurrence of vomiting after the first injection
+    println("\nQuestion 3: Which vaccination type has the highest occurrence of vomiting after first injection in the provided data?")
+
+    val vomitingAfterFirstInjection = aefiGroupedByVaxType.map { case (vaxType, records) =>
+      val totalVomitingD1 = records.map(_.d1_vomiting).sum
+      vaxType -> totalVomitingD1
+    }
+
+    // display each brand
+    println("Total vomiting occurrences after first injection by type:")
+    vomitingAfterFirstInjection.foreach { case (vaxType, totalVomitingD1) =>
+      println(s"$vaxType: $totalVomitingD1")
+    }
+
+    val highestVomitingVaxType = vomitingAfterFirstInjection.maxBy(_._2)
+
+    println(s"Ans: The vaccination type with the highest occurrence of vomiting after the first injection is ${highestVomitingVaxType._1} with ${highestVomitingVaxType._2} occurrences.")
+  }
+}
 }
