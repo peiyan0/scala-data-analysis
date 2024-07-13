@@ -1,7 +1,6 @@
 import scala.io.Source
 import scala.collection.mutable.{ArrayBuffer, HashMap}
 
-
 // extract useful data
 case class AEFIData(
  vax_type: String,
@@ -11,8 +10,6 @@ case class AEFIData(
 )
 
 object MyApp extends App {
-  val startTime = System.currentTimeMillis()
-
   // read AEFI data from CSV file
   def readAEFIData(filePath: String): ArrayBuffer[AEFIData] = {
     val source = Source.fromFile(filePath)
@@ -41,7 +38,6 @@ object MyApp extends App {
   val path = "src/main/resources/aefi.csv"
   // read data from aefi.csv
   val aefiData: ArrayBuffer[AEFIData] = readAEFIData(path)
-
   // populate grouped data using mutable HashMap for grouping
   val groupedData = HashMap.empty[String, ArrayBuffer[AEFIData]]
   aefiData.foreach { aefi =>
@@ -50,21 +46,20 @@ object MyApp extends App {
     buffer += aefi
   }
 
-  // function used in question 1
-  // get total number of doses by vax type
+  // function used in question 1: get total number of doses by vax type
   def getTotalDosesByVaxType: Map[String, Int] = {
     groupedData.mapValues(_.size).toMap
   }
-  // function used in question 2
-  // get average headache by vax type
+
+  // function used in question 2: get average headache by vax type
   def getAverageHeadacheByVaxType: Map[String, Double] = {
     groupedData.mapValues { records =>
       val totalHeadache = records.map(r => r.d1_headache + r.d2_headache).sum
       totalHeadache.toDouble / records.size
     }.toMap
   }
-  // function used in question 3
-  // get vomiting occurrence after first injection by vax type
+
+  // function used in question 3: get vomiting occurrence after first injection by vax type
   def getVomitingAfterFirstInjection: Map[String, Int] = {
     groupedData.mapValues(_.map(_.d1_vomiting).sum).toMap
   }
@@ -80,7 +75,6 @@ object MyApp extends App {
   }
   println(s"Ans: The most commonly used vaccine product is ${mostCommonVaccine._1} with a total of ${mostCommonVaccine._2} doses.")
 
-
   // question 2
   println("\nQuestion 2: What are the average occurrence of headache for each type of vaccination product in the provided data?")
   val avgHeadacheByVaxType = getAverageHeadacheByVaxType
@@ -88,7 +82,6 @@ object MyApp extends App {
   avgHeadacheByVaxType.foreach { case (vaxType, avgHeadache) =>
     println(s"$vaxType: $avgHeadache")
   }
-
 
   // question 3
   println("\nQuestion 3: Which vaccination type has the highest occurrence of vomiting after first injection in the provided data?")
@@ -99,7 +92,4 @@ object MyApp extends App {
     println(s"$vaxType: $totalVomitingD1")
   }
   println(s"Ans: The vaccination type with the highest occurrence of vomiting after the first injection is ${highestVomitingVaxType._1} with ${highestVomitingVaxType._2} occurrences.")
-
-  val endTime = System.currentTimeMillis()
-  println("Time taken: " + (endTime - startTime) + "ms") // 272 millisecond = 2.72s
 }
