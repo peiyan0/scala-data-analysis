@@ -103,7 +103,7 @@ object MyApp extends App {
   val groupedData: HashMap[String, ArrayBuffer[AEFIData]] = groupAEFIData(aefiData)
 
   println("  PRG2103 Assignment 2")
-  println("-"*25)
+  println("-"*25) // decorator
   // Question 1
   println("\nQuestion 1: Which vaccination product is the most commonly used by Malaysian?")
   TotalDosesByVaxType(groupedData)
@@ -116,3 +116,40 @@ object MyApp extends App {
   println("\n\nQuestion 3: Which vaccination type has the highest occurrence of vomiting after first injection in the provided data?")
   VomitingAfterFirstInjection(groupedData)
 }
+
+// SAMPLE OUTPUT
+/**
+ * PRG2103 Assignment 2
+ * -------------------------
+ *
+ * Question 1: Which vaccination product is the most commonly used by Malaysian?
+ * Total doses for each vaccine product:
+ * Vax Type             | Total Occurrence
+ * ---------------------------------------------
+ * astrazeneca          | 399
+ * pfizer               | 468
+ * sinopharm            | 219
+ * sinovac              | 435
+ * Ans: The most commonly used vaccine product is pfizer with a total of 468 doses.
+ *
+ *
+ * Question 2: What are the average occurrence of headache for each type of vaccination product in the provided data?
+ * Total and Average Occurrence of Headache for each type of vaccination product:
+ * Vax Type             | Total Occurrence     | Average Occurrence
+ * ----------------------------------------------------------------------
+ * astrazeneca          | 236211               | 592.01
+ * pfizer               | 148250               | 316.77
+ * sinopharm            | 36                   | 0.16
+ * sinovac              | 80419                | 184.87
+ *
+ *
+ * Question 3: Which vaccination type has the highest occurrence of vomiting after first injection in the provided data?
+ * Total vomiting occurrences after first injection by vaccination type:
+ * Vax Type             | Total Occurrence
+ * ---------------------------------------------
+ * astrazeneca          | 52429
+ * pfizer               | 36152
+ * sinopharm            | 6
+ * sinovac              | 20600
+ * Ans: The vaccination type with the highest occurrence of vomiting after the first injection is astrazeneca with 52429 occurrences.
+ */
