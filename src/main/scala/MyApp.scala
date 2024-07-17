@@ -1,5 +1,5 @@
 import scala.io.Source
-import scala.collection.mutable.{ArrayBuffer, HashMap}
+import scala.collection.mutable.ArrayBuffer
 
 // extract useful data
 case class AEFIData( vaxType: String,
@@ -9,14 +9,14 @@ case class AEFIData( vaxType: String,
 
 object MyApp extends App {
   // read AEFI data from CSV file
-  def readAEFIData(filePath: String): ArrayBuffer[AEFIData] = {
+  def readAEFIData(filePath: String): Seq[AEFIData] = {
     val source = Source.fromFile(filePath)
     val dataBuffer = ArrayBuffer.empty[AEFIData]
     try {
       source.getLines().drop(1).foreach { line => // remove header
         val cols = line.split(",").map(_.trim)
         val aefiData = AEFIData(
-          cols(1),      // vaxType
+          cols(1),       // vaxType
           cols(12).toInt, // d1_headache
           cols(24).toInt, // d2_headache
           cols(17).toInt  // d1_vomiting
@@ -29,22 +29,16 @@ object MyApp extends App {
     } finally {
       source.close()
     }
-    dataBuffer
+    dataBuffer.toSeq
   }
 
-  // Populate grouped data using mutable HashMap for grouping
-  def groupAEFIData(data: ArrayBuffer[AEFIData]): HashMap[String, ArrayBuffer[AEFIData]] = {
-    val groupedData = HashMap.empty[String, ArrayBuffer[AEFIData]]
-    data.foreach { aefi =>
-      val vaxType = aefi.vaxType
-      val buffer = groupedData.getOrElseUpdate(vaxType, ArrayBuffer.empty[AEFIData])
-      buffer += aefi
-    }
-    groupedData
+  // group AEFI data by vaccine type
+  def groupAEFIData[T](data: Seq[AEFIData], keyExtractor: AEFIData => T): Map[T, Seq[AEFIData]] = {
+    data.groupBy(keyExtractor)
   }
 
   // print sorted map data given description in table with 2 columns
-  def printSortedMap2(data: Seq[(String, Int)], description: String): Unit = {
+  def printSortedMap2[T](data: Seq[(T, Int)], description: String)(implicit ordering: Ordering[T]): Unit = {
     println(description)
     println(f"${"Vax Type"}%-20s | ${"Total Occurrence"}%-20s ")
     println("-" * 45)
@@ -52,8 +46,9 @@ object MyApp extends App {
       println(f"$vaxType%-20s | $total%-20d ")
     }
   }
+
   // print sorted map data given description in table with 3 columns
-  def printSortedMap3(data: Seq[(String, (Int, Double))], description: String): Unit = {
+  def printSortedMap3[T](data: Seq[(T, (Int, Double))], description: String)(implicit ordering: Ordering[T]): Unit = {
     println(description)
     println(f"${"Vax Type"}%-20s | ${"Total Occurrence"}%-20s | ${"Average Occurrence"}%-20s")
     println("-" * 70)
@@ -62,22 +57,19 @@ object MyApp extends App {
     }
   }
 
-  // function used in question 1:
-  // get total number of doses by vax type
-  def TotalDosesByVaxType(groupedData: HashMap[String, ArrayBuffer[AEFIData]]): Unit = {
-    val totalDosesByVaxType = groupedData.mapValues(_.size).toMap
+  // calculate total doses by vaccine type
+  def totalDosesByVaxType(groupedData: Map[String, Seq[AEFIData]]): Unit = {
+    val totalDosesByVaxType = groupedData.mapValues(_.size).toSeq
     val mostCommonVaccine = totalDosesByVaxType.maxBy(_._2)
-    printSortedMap2(totalDosesByVaxType.toSeq.map(kv => (kv._1, kv._2)), "Total doses for each vaccine product:")
+    printSortedMap2(totalDosesByVaxType, "Total doses for each vaccine product:")
     println(s"Ans: The most commonly used vaccine product is ${mostCommonVaccine._1} with a total of ${mostCommonVaccine._2} doses.")
   }
 
-  // function used in question 2:
-  // get total and avg headache by vax type
-  def HeadacheByVaxType(groupedData: HashMap[String, ArrayBuffer[AEFIData]]): Unit = {
+  // calculate total and average headache by vaccine type
+  def headacheByVaxType(groupedData: Map[String, Seq[AEFIData]]): Unit = {
     val totalHeadacheByVaxType = groupedData.mapValues { records =>
       records.map(r => r.d1_headache + r.d2_headache).sum
-    }.toMap
-
+    }
     val avgHeadacheByVaxType = totalHeadacheByVaxType.map { case (vaxType, totalHeadache) =>
       val avgHeadache = totalHeadache.toDouble / groupedData(vaxType).size
       (vaxType, (totalHeadache, avgHeadache))
@@ -85,12 +77,11 @@ object MyApp extends App {
     printSortedMap3(avgHeadacheByVaxType, "Total and Average Occurrence of Headache for each type of vaccination product:")
   }
 
-  // function used in question 3:
-  // get vomiting occurrence after first injection by vax type
-  def VomitingAfterFirstInjection(groupedData: HashMap[String, ArrayBuffer[AEFIData]]): Unit = {
-    val vomitingAfterFirstInjection = groupedData.mapValues(_.map(_.d1_vomiting).sum).toMap
+  // calculate vomiting occurrences after first injection by vaccine type
+  def vomitingAfterFirstInjection(groupedData: Map[String, Seq[AEFIData]]): Unit = {
+    val vomitingAfterFirstInjection = groupedData.mapValues(_.map(_.d1_vomiting).sum).toSeq
     val highestVomitingVaxType = vomitingAfterFirstInjection.maxBy(_._2)
-    printSortedMap2(vomitingAfterFirstInjection.toSeq.map(kv => (kv._1, kv._2)), "Total vomiting occurrences after first injection by vaccination type:")
+    printSortedMap2(vomitingAfterFirstInjection, "Total vomiting occurrences after first injection by vaccination type:")
     println(s"Ans: The vaccination type with the highest occurrence of vomiting after the first injection is ${highestVomitingVaxType._1} with ${highestVomitingVaxType._2} occurrences.")
   }
 
@@ -98,58 +89,21 @@ object MyApp extends App {
   // location of aefi.csv
   val path = "src/main/resources/aefi.csv"
   // read data from aefi.csv
-  val aefiData: ArrayBuffer[AEFIData] = readAEFIData(path)
-  // group data by vax type, used to compute statistics
-  val groupedData: HashMap[String, ArrayBuffer[AEFIData]] = groupAEFIData(aefiData)
+  val aefiData: Seq[AEFIData] = readAEFIData(path)
+  // group data by vax type
+  val groupedData: Map[String, Seq[AEFIData]] = groupAEFIData(aefiData, _.vaxType)
 
   println("  PRG2103 Assignment 2")
-  println("-"*25) // decorator
+  println("-" * 25) // decorator
   // Question 1
   println("\nQuestion 1: Which vaccination product is the most commonly used by Malaysian?")
-  TotalDosesByVaxType(groupedData)
+  totalDosesByVaxType(groupedData)
 
   // Question 2
   println("\n\nQuestion 2: What are the average occurrence of headache for each type of vaccination product in the provided data?")
-  HeadacheByVaxType(groupedData)
+  headacheByVaxType(groupedData)
 
   // Question 3
   println("\n\nQuestion 3: Which vaccination type has the highest occurrence of vomiting after first injection in the provided data?")
-  VomitingAfterFirstInjection(groupedData)
+  vomitingAfterFirstInjection(groupedData)
 }
-
-// SAMPLE OUTPUT
-/**
- * PRG2103 Assignment 2
- * -------------------------
- *
- * Question 1: Which vaccination product is the most commonly used by Malaysian?
- * Total doses for each vaccine product:
- * Vax Type             | Total Occurrence
- * ---------------------------------------------
- * astrazeneca          | 399
- * pfizer               | 468
- * sinopharm            | 219
- * sinovac              | 435
- * Ans: The most commonly used vaccine product is pfizer with a total of 468 doses.
- *
- *
- * Question 2: What are the average occurrence of headache for each type of vaccination product in the provided data?
- * Total and Average Occurrence of Headache for each type of vaccination product:
- * Vax Type             | Total Occurrence     | Average Occurrence
- * ----------------------------------------------------------------------
- * astrazeneca          | 236211               | 592.01
- * pfizer               | 148250               | 316.77
- * sinopharm            | 36                   | 0.16
- * sinovac              | 80419                | 184.87
- *
- *
- * Question 3: Which vaccination type has the highest occurrence of vomiting after first injection in the provided data?
- * Total vomiting occurrences after first injection by vaccination type:
- * Vax Type             | Total Occurrence
- * ---------------------------------------------
- * astrazeneca          | 52429
- * pfizer               | 36152
- * sinopharm            | 6
- * sinovac              | 20600
- * Ans: The vaccination type with the highest occurrence of vomiting after the first injection is astrazeneca with 52429 occurrences.
- */
