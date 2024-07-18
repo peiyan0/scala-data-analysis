@@ -42,20 +42,22 @@ object MyApp extends App {
   // print sorted map data given description in table with 2 columns
   def printSortedMap2[T](data: Seq[(T, Int)], description: String)(implicit ordering: Ordering[T]): Unit = {
     println(description)
-    println(f"${"Vax Type"}%-20s | ${"Total Occurrence"}%-20s ")
+    println("-" * 45)
+    println(f"${"Vaccination Product"}%-21s |   ${"Total Occurrence"}%-18s ")
     println("-" * 45)
     data.sortBy(_._1).foreach { case (vaxType, total) =>
-      println(f"$vaxType%-20s | $total%-20d ")
+      println(f"$vaxType%-21s |   $total%-18d ")
     }
   }
 
   // print sorted map data given description in table with 3 columns
   def printSortedMap3[T](data: Seq[(T, (Int, Double))], description: String)(implicit ordering: Ordering[T]): Unit = {
     println(description)
-    println(f"${"Vax Type"}%-20s | ${"Total Occurrence"}%-20s | ${"Average Occurrence"}%-20s")
-    println("-" * 70)
+    println("-" * 87)
+    println(f"${"Vaccination Product"}%-21s |   ${"Total Occurrence"}%-18s |   ${"Average Occurrence by No. of Records"}%-20s")
+    println("-" * 87)
     data.sortBy(_._1).foreach { case (vaxType, (total, avg)) =>
-      println(f"$vaxType%-20s | $total%-20d | $avg%-20.4f")
+      println(f"$vaxType%-21s |   $total%-18d |   $avg%-20.4f")
     }
   }
 
@@ -109,3 +111,43 @@ object MyApp extends App {
   println("\n\nQuestion 3: Which vaccination type has the highest occurrence of vomiting after first injection in the provided data?")
   vomitingAfterFirstInjection(groupedData)
 }
+
+// sample output
+/**
+ * PRG2103 Assignment 2
+ * -------------------------
+ *
+ * Question 1: Which vaccination product is the most commonly used by Malaysian?
+ * Total doses for each vaccine product:
+ * ---------------------------------------------
+ * Vaccination Product   |   Total Occurrence
+ * ---------------------------------------------
+ * astrazeneca           |   388394
+ * pfizer                |   429277
+ * sinopharm             |   74
+ * sinovac               |   191420
+ * Ans: The most commonly used vaccine product is pfizer with a total of 429277 doses.
+ *
+ *
+ * Question 2: What are the average occurrence of headache for each type of vaccination product in the provided data?
+ * Total and Average Occurrence of Headache for each type of vaccination product:
+ * ---------------------------------------------------------------------------------------
+ * Vaccination Product   |   Total Occurrence   |   Average Occurrence by No. of Records
+ * ---------------------------------------------------------------------------------------
+ * astrazeneca           |   236211             |   592.0075
+ * pfizer                |   148250             |   316.7735
+ * sinopharm             |   36                 |   0.1644
+ * sinovac               |   80419              |   184.8713
+ *
+ *
+ * Question 3: Which vaccination type has the highest occurrence of vomiting after first injection in the provided data?
+ * Total vomiting occurrences after first injection by vaccination type:
+ * ---------------------------------------------
+ * Vaccination Product   |   Total Occurrence
+ * ---------------------------------------------
+ * astrazeneca           |   52429
+ * pfizer                |   36152
+ * sinopharm             |   6
+ * sinovac               |   20600
+ * Ans: The vaccination type with the highest occurrence of vomiting after the first injection is astrazeneca with 52429 occurrences.
+ */
