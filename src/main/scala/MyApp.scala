@@ -3,6 +3,7 @@ import scala.collection.mutable.ArrayBuffer
 
 // extract useful data
 case class AEFIData( vaxType: String,
+                     dailyTotal: Int,
                      d1_headache: Int,
                      d2_headache: Int,
                      d1_vomiting: Int )
@@ -17,6 +18,7 @@ object MyApp extends App {
         val cols = line.split(",").map(_.trim)
         val aefiData = AEFIData(
           cols(1),       // vaxType
+          cols(2).toInt,   // dailyTotal
           cols(12).toInt, // d1_headache
           cols(24).toInt, // d2_headache
           cols(17).toInt  // d1_vomiting
@@ -53,13 +55,13 @@ object MyApp extends App {
     println(f"${"Vax Type"}%-20s | ${"Total Occurrence"}%-20s | ${"Average Occurrence"}%-20s")
     println("-" * 70)
     data.sortBy(_._1).foreach { case (vaxType, (total, avg)) =>
-      println(f"$vaxType%-20s | $total%-20d | $avg%-20.2f")
+      println(f"$vaxType%-20s | $total%-20d | $avg%-20.4f")
     }
   }
 
   // calculate total doses by vaccine type
   def totalDosesByVaxType(groupedData: Map[String, Seq[AEFIData]]): Unit = {
-    val totalDosesByVaxType = groupedData.mapValues(_.size).toSeq
+    val totalDosesByVaxType = groupedData.mapValues(dataSeq => dataSeq.map(_.dailyTotal).sum).toSeq
     val mostCommonVaccine = totalDosesByVaxType.maxBy(_._2)
     printSortedMap2(totalDosesByVaxType, "Total doses for each vaccine product:")
     println(s"Ans: The most commonly used vaccine product is ${mostCommonVaccine._1} with a total of ${mostCommonVaccine._2} doses.")
