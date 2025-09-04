@@ -1,4 +1,4 @@
-## AEFI Data Analysis
+## COVID-19 Vaccine Analysis
 - This project analyzes Adverse Events Following Immunization (AEFI) data for different vaccination products. 
 - The data is read from a CSV file and various analyses are performed to answer specific questions.
 
