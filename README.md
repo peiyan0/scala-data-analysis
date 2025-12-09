@@ -1,21 +1,46 @@
-## COVID-19 Vaccine Analysis
-- This project analyzes Adverse Events Following Immunization (AEFI) data for different vaccination products. 
-- The data is read from a CSV file and various analyses are performed to answer specific questions.
+# 💉 COVID-19 Vaccine AEFI Data Analysis
 
-### Project Structure
-- [MyApp.scala](src/main/scala/MyApp.scala): Main application code.
-- [aefi.csv](src/main/resources/aefi.csv): CSV file containing AEFI data, retrieved from [MoH-Malaysia](https://github.com/MoH-Malaysia/covid19-public)
+> A data analysis project that processes Adverse Events Following Immunization (AEFI) data to derive key insights on vaccination products, focusing on occurrences of side effects in Malaysia.
 
-### Analysis Performed 
-- calculates the total doses for each vaccine product and identifies the most commonly used vaccine.
-- calculates the total and average occurrences of headaches for each vaccine product.
-- calculates the total occurrences of vomiting after the first injection for each vaccine product and identifies the one with the highest occurrence.  
+<p align="center">
+  <img src="https://img.shields.io/badge/Domain-Public%20Health%20Data-red?style=for-the-badge" alt="Domain: Public Health Data" />
+  <img src="https://img.shields.io/badge/Source-MoH--Malaysia-informational?style=for-the-badge" alt="Source: MoH-Malaysia" />
+</p>
 
-### Sample Output
+## 📊 Key Analysis Performed
+
+This project processes raw AEFI data to answer critical public health questions:
+
+1.  **Usage Frequency**: Calculates the total doses administered for each vaccine to identify the **most commonly used vaccine product**.
+2.  **Headache Occurrence**: Determines the **total and average occurrences of headaches** for every vaccine type.
+3.  **First-Dose Reactions**: Identifies the vaccine with the **highest occurrence of vomiting** specifically after the first injection.
+
+## 💻 Tech Stack
+
+| Category | Technologies |
+| :--- | :--- |
+| **Language** | ![Scala](https://img.shields.io/badge/Scala-DC322F?style=for-the-badge&logo=scala&logoColor=white) |
+| **Data Source** | `aefi.csv` (Retrieved from [MoH-Malaysia/covid19-public](https://github.com/MoH-Malaysia/covid19-public)) |
+| **Environment** | Java Development Kit (JDK) |
+| **Tooling** | Sbt (Scala Build Tool) |
+
+## 📁 Project Structure
+
+The project is structured simply for clarity and focus on the analysis logic:
 ```
-PRG2103 Assignment 2
--------------------------
+. ├── src/ 
+│ └── main/ 
+│ ├── resources/ 
+│ │ └── aefi.csv # The raw AEFI dataset 
+│ └── scala/ 
+│ └── MyApp.scala # ➡️ Main application logic 
+└── build.sbt
+```
 
+## 🔍 Sample Output
+
+Below is a snapshot of the insights generated from the analysis:
+```
 Question 1: Which vaccination product is the most commonly used by Malaysian?
 Total doses for each vaccine product:
 ---------------------------------------------
